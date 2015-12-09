@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Time Tracking and Invoicing</title>
+		<link rel="stylesheet" href="index.css">
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Time Tracker</h1>
+			</header>
+			<section class="main">
+				<form>
+			    <input type="text" name="task" placeholder="Name your task">
+			    <input type="text" name="client" placeholder="Who is this for">
+			    <input type="text" name="rate" placeholder="$/hour">
+			  </form>
+				<h2><time>00:00:00</time></h2>
+				<div class="buttons">
+					<button id="start">start</button>
+					<button id="stop">stop</button>
+					<button id="done">done</button>
+				</div>
+				<ul></ul>
+			</section>
+			<footer></footer>
+		</div>
+	</body>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+</html>
