@@ -1,17 +1,16 @@
 var $ = require('jquery');
 
 var h2 = document.getElementsByTagName('h2')[0],
-    list = document.getElementsByTagName('ul')[0],
+    taskList = document.getElementsByTagName('ul')[0],
     start = document.getElementById('start'),
     stop = document.getElementById('stop'),
-    done = document.getElementById('done'),
     total = document.getElementById('total'),
+    form = document.getElementsByTagName('form')[0],
     seconds = 0,
     minutes = 0,
     hours = 0,
     time,
     interval;
-
 
 function countUp() {
   seconds++;
@@ -31,19 +30,25 @@ function timer() {
   interval = setInterval(countUp, 1000);
 }
 
-$('form').on('submit', function(e) {
-  e.preventDefault();
-  var values = $('form').serializeArray();
-  var valuesObj = {};
-  console.log(values)
-  var taskInfo = values.reduce(function(prev, curr) {
-    return prev + ' ' + curr.name + ': ' + curr.value;
-  },'');
+function createTaskItem (values) {
+  var taskInfo = values
+    .map(function(val) { return val.name + ': ' + val.value; })
+    .join(' ');
   var li = document.createElement('li');
-  li.textContent = taskInfo + ' time: ' + time;
-  $(li).data('task', {})
-  list.appendChild(li);
-  $('input').val('');
+  li.textContent = taskInfo + ' time: ' + time; 
+  return li;
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  clearInterval(interval);
+  h2.textContent = '00:00:00';
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
+  var values = $('form').serializeArray();
+  taskList.appendChild(createTaskItem(values));
+  $('input[type="text"]').val('');
 });
 
 start.onclick = function() {
@@ -54,17 +59,7 @@ stop.onclick = function() {
   clearInterval(interval);
 }
 
-done.onclick = function() {
-  $('form').submit();
-  clearInterval(interval);
-  h2.textContent = '00:00:00';
-  seconds = 0;
-  minutes = 0;
-  hours = 0;
-}
-
 total.onclick = function() {
   console.log($('li'));
-  // $('section').append('<p>Total hours: ' + hours + '</p>');
-  // console.log(parseInt(time, 10));
+  $('section').append('<p>Total hours: ' + hours + '</p>');
 }
