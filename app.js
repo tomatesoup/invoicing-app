@@ -1,11 +1,13 @@
-var $ = require('jquery');
+var serialize = require('form-serialize');
+var _ = require('lodash');
 
 var h2 = document.getElementsByTagName('h2')[0],
     taskList = document.getElementsByTagName('ul')[0],
     start = document.getElementById('start'),
     stop = document.getElementById('stop'),
     total = document.getElementById('total'),
-    form = document.getElementsByTagName('form')[0],
+    // form = document.getElementsByTagName('form')[0],
+    form = document.querySelector('#form'),
     seconds = 0,
     minutes = 0,
     hours = 0,
@@ -31,9 +33,7 @@ function timer() {
 }
 
 function createTaskItem (values) {
-  var taskInfo = values
-    .map(function(val) { return val.name + ': ' + val.value; })
-    .join(' ');
+  var taskInfo = _.map(values, function(v,k) { return k + ': ' + v }).join(' ');
   var li = document.createElement('li');
   li.textContent = taskInfo + ' time: ' + time; 
   return li;
@@ -46,9 +46,10 @@ form.addEventListener('submit', function(e) {
   seconds = 0;
   minutes = 0;
   hours = 0;
-  var values = $('form').serializeArray();
-  taskList.appendChild(createTaskItem(values));
-  $('input[type="text"]').val('');
+  taskList.appendChild(
+    createTaskItem(serialize(form, true))
+   );
+  form.reset();
 });
 
 start.onclick = function() {
@@ -60,6 +61,6 @@ stop.onclick = function() {
 }
 
 total.onclick = function() {
-  console.log($('li'));
-  $('section').append('<p>Total hours: ' + hours + '</p>');
+  // console.log($('li'));
+  // $('section').append('<p>Total hours: ' + hours + '</p>');
 }
