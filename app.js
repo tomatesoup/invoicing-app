@@ -58,9 +58,9 @@ done.onclick = function() {
   $('form').submit();
   clearInterval(interval);
   h2.textContent = '00:00:00';
-  // seconds = 0;
-  // minutes = 0;
-  // hours = 0;
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
 }
 
 total.onclick = function() {
