@@ -1,12 +1,20 @@
 var serialize = require('form-serialize');
 var _ = require('lodash');
 
+var state = {
+  timer: {
+    seconds: 0,
+    minutes: 0,
+    hours: 0
+  },
+  tasks: []
+}
+
 var h2 = document.getElementsByTagName('h2')[0],
-    taskList = document.getElementsByTagName('ul')[0],
+    list = document.getElementsByTagName('ul')[0],
     start = document.getElementById('start'),
     stop = document.getElementById('stop'),
     total = document.getElementById('total'),
-    // form = document.getElementsByTagName('form')[0],
     form = document.querySelector('#form'),
     seconds = 0,
     minutes = 0,
@@ -39,6 +47,13 @@ function createTaskItem (values) {
   return li;
 }
 
+function render (s) {
+  list.innerHTML = '';
+  _.forEach(_.map(s.tasks, createTaskItem), function (element) {
+    list.appendChild(element)
+  });
+}
+
 form.addEventListener('submit', function(e) {
   e.preventDefault();
   clearInterval(interval);
@@ -46,9 +61,8 @@ form.addEventListener('submit', function(e) {
   seconds = 0;
   minutes = 0;
   hours = 0;
-  taskList.appendChild(
-    createTaskItem(serialize(form, true))
-   );
+  state.tasks.push(serialize(form, true));
+  render(state);
   form.reset();
 });
 
