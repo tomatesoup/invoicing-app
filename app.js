@@ -1,17 +1,26 @@
-var $ = require('jquery');
+var serialize = require('form-serialize');
+var _ = require('lodash');
+
+var state = {
+  timer: {
+    seconds: 0,
+    minutes: 0,
+    hours: 0
+  },
+  tasks: []
+}
 
 var h2 = document.getElementsByTagName('h2')[0],
     list = document.getElementsByTagName('ul')[0],
     start = document.getElementById('start'),
     stop = document.getElementById('stop'),
-    done = document.getElementById('done'),
     total = document.getElementById('total'),
+    form = document.querySelector('#form'),
     seconds = 0,
     minutes = 0,
     hours = 0,
     time,
     interval;
-
 
 function countUp() {
   seconds++;
@@ -23,27 +32,50 @@ function countUp() {
       hours ++;
     }
   }
+  time = { hours: hours, minutes: minutes, seconds: seconds };
+  h2.textContent = formatTime(time); 
+}
 
-  time = h2.textContent = (hours ? (hours > 9 ? hours : '0' + hours) : '00') + ':' + (minutes ? (minutes > 9 ? minutes : '0' + minutes) : '00') + ':' + (seconds > 9 ? seconds : '0'+ seconds);
+function formatTime(t) {
+  t = (t.hours ? (t.hours > 9 ? t.hours : '0' + t.hours) : '00') + ':' + (t.minutes ? (t.minutes > 9 ? t.minutes : '0' + t.minutes) : '00') + ':' + (t.seconds > 9 ? t.seconds : '0'+ t.seconds);  
+  return t;
 }
 
 function timer() {
   interval = setInterval(countUp, 1000);
 }
 
-$('form').on('submit', function(e) {
-  e.preventDefault();
-  var values = $('form').serializeArray();
-  var valuesObj = {};
-  console.log(values)
-  var taskInfo = values.reduce(function(prev, curr) {
-    return prev + ' ' + curr.name + ': ' + curr.value;
-  },'');
+function createTaskItem(values) {
+  var taskInfo = _.map(values, function(v,k) {
+    if (k === 'time') {
+      v = formatTime(time);
+    } 
+    return k + ': ' + v 
+    }).join(' ');
   var li = document.createElement('li');
-  li.textContent = taskInfo + ' time: ' + time;
-  $(li).data('task', {})
-  list.appendChild(li);
-  $('input').val('');
+  li.textContent = taskInfo; 
+  return li;
+}
+
+function update(s) {
+  list.innerHTML = '';
+  _.forEach(_.map(s.tasks, createTaskItem), function(element) {
+    list.appendChild(element);
+  });
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  clearInterval(interval);
+  var taskObj = serialize(form, true);
+  taskObj.time = time;
+  state.tasks.push(taskObj);
+  update(state);
+  form.reset();
+  h2.textContent = '00:00:00';
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
 });
 
 start.onclick = function() {
@@ -54,17 +86,13 @@ stop.onclick = function() {
   clearInterval(interval);
 }
 
-done.onclick = function() {
-  $('form').submit();
-  clearInterval(interval);
-  h2.textContent = '00:00:00';
-  seconds = 0;
-  minutes = 0;
-  hours = 0;
+function displayTotal(total) {
+  var p = document.createElement('p');
+  p.textContent = 'Total hours: ' + total;
+  return p;
 }
 
 total.onclick = function() {
-  console.log($('li'));
-  // $('section').append('<p>Total hours: ' + hours + '</p>');
-  // console.log(parseInt(time, 10));
+  var totalHours = _.reduce(state.tasks, function(task) { return task.time.hours } );
+  list.appendChild(displayTotal(totalHours));
 }

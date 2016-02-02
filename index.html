@@ -11,18 +11,18 @@
 				<h1>Time Tracker</h1>
 			</header>
 			<section class="main">
-				<form>
+				<form id="form">
 			    <input type="text" name="task" placeholder="Name your task">
 			    <input type="text" name="client" placeholder="Who is this for">
 			    <input type="text" name="rate" placeholder="$/hour">
+          <div class="buttons">
+            <button type="button" id="start">start</button>
+            <button type="button" id="stop">stop</button>
+            <input type="submit" value="done">
+            <button type="button" id="total">total</button>
+				  </div>
 			  </form>
 				<h2><time>00:00:00</time></h2>
-				<div class="buttons">
-					<button id="start">start</button>
-					<button id="stop">stop</button>
-					<button id="done">done</button>
-					<button id="total">total</button>
-				</div>
 				<ul></ul>
 			</section>
 			<footer></footer>
