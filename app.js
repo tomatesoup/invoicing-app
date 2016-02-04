@@ -10,17 +10,27 @@ var state = {
   tasks: []
 }
 
+var EMPTY_TIMER = {
+  hours: 0,
+  minutes: 0,
+  seconds: 0
+}
+
 var h2 = document.getElementsByTagName('h2')[0],
     list = document.getElementsByTagName('ul')[0],
     start = document.getElementById('start'),
     stop = document.getElementById('stop'),
     total = document.getElementById('total'),
     form = document.querySelector('#form'),
+    create = document.getElementById('create-invoice'),
     seconds = 0,
     minutes = 0,
     hours = 0,
-    time,
-    interval;
+    time = {},
+    interval,
+    billableHours = [];
+
+create.style.display = 'none';
 
 function countUp() {
   seconds++;
@@ -37,8 +47,7 @@ function countUp() {
 }
 
 function formatTime(t) {
-  t = (t.hours ? (t.hours > 9 ? t.hours : '0' + t.hours) : '00') + ':' + (t.minutes ? (t.minutes > 9 ? t.minutes : '0' + t.minutes) : '00') + ':' + (t.seconds > 9 ? t.seconds : '0'+ t.seconds);  
-  return t;
+  return (t.hours ? (t.hours > 9 ? t.hours : '0' + t.hours) : '00') + ':' + (t.minutes ? (t.minutes > 9 ? t.minutes : '0' + t.minutes) : '00') + ':' + (t.seconds > 9 ? t.seconds : '0'+ t.seconds);
 }
 
 function timer() {
@@ -48,10 +57,10 @@ function timer() {
 function createTaskItem(values) {
   var taskInfo = _.map(values, function(v,k) {
     if (k === 'time') {
-      v = formatTime(time);
+      v = formatTime(v);
     } 
     return k + ': ' + v 
-    }).join(' ');
+  }).join(' ');
   var li = document.createElement('li');
   li.textContent = taskInfo; 
   return li;
@@ -68,7 +77,7 @@ form.addEventListener('submit', function(e) {
   e.preventDefault();
   clearInterval(interval);
   var taskObj = serialize(form, true);
-  taskObj.time = time;
+  taskObj.time = Object.assign({}, time);
   state.tasks.push(taskObj);
   update(state);
   form.reset();
@@ -92,7 +101,34 @@ function displayTotal(total) {
   return p;
 }
 
+function timeConverter(t) {
+  return {
+    carry: Math.floor(t / 60),
+    remainder: t % 60
+  }; 
+}
+
 total.onclick = function() {
-  var totalHours = _.reduce(state.tasks, function(task) { return task.time.hours } );
-  list.appendChild(displayTotal(totalHours));
+  var totalTime = _.reduce(state.tasks, function(pile, task) {
+    return {
+      hours: pile.hours + task.time.hours, 
+      minutes: pile.minutes + task.time.minutes, 
+      seconds: pile.seconds + task.time.seconds 
+    };
+  }, Object.assign({}, EMPTY_TIMER))
+  
+  var convertedSeconds = timeConverter(totalTime.seconds);
+  var convertedMinutes = timeConverter(totalTime.minutes + convertedSeconds.carry);
+  var convertedHours = totalTime.hours + convertedMinutes.carry;
+
+  var finalTime = {
+    hours: convertedHours,
+    minutes: convertedMinutes.remainder,
+    seconds: convertedSeconds.remainder
+  }
+  
+  billableHours.push(finalTime);
+  
+  list.appendChild(displayTotal(formatTime(finalTime)));
+  create.style.display = '';
 }
