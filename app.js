@@ -1,5 +1,8 @@
 var serialize = require('form-serialize');
 var _ = require('lodash');
+var formatTime = require('./utilities/utilities').formatTime;
+var timer = require('./components/timer');
+var taskItem = require('./components/taskItem');
 
 var state = {
   timer: {
@@ -17,7 +20,6 @@ var EMPTY_TIMER = {
 }
 
 var h1 = document.getElementsByTagName('h1')[0],
-    timeElement = document.getElementsByTagName('time')[0],
     list = document.getElementsByTagName('ul')[0],
     main = document.querySelector('#main-button'),
     done = document.getElementById('done'),
@@ -30,7 +32,8 @@ var h1 = document.getElementsByTagName('h1')[0],
     hours = 0,
     time = {},
     interval = null,
-    billableHours = [];
+    billableHours = [],
+    updateTimer = timer(document.querySelector('#timer-container'));
 
 create.style.display = 'none';
 
@@ -45,11 +48,7 @@ function countUp() {
     }
   }
   time = { hours: hours, minutes: minutes, seconds: seconds };
-  timeElement.textContent = formatTime(time); 
-}
-
-function formatTime(t) {
-  return (t.hours ? (t.hours > 9 ? t.hours : '0' + t.hours) : '00') + ':' + (t.minutes ? (t.minutes > 9 ? t.minutes : '0' + t.minutes) : '00') + ':' + (t.seconds > 9 ? t.seconds : '0'+ t.seconds);
+  updateTimer(time); 
 }
 
 function startTimer() {
@@ -65,18 +64,6 @@ function stopTimer() {
   main.textContent = 'start';
 }
 
-function createTaskItem(values) {
-  var taskInfo = _.map(values, function(v,k) {
-    if (k === 'time') {
-      v = formatTime(v);
-    } 
-    return k + ': ' + v 
-  }).join(' ');
-  var li = document.createElement('li');
-  li.textContent = taskInfo; 
-  return li;
-}
-
 function update(s) {
   if (!s.tasks.length) {
     total.classList.add('is-disabled');
@@ -84,7 +71,7 @@ function update(s) {
     total.classList.remove('is-disabled');   
   }  
   list.innerHTML = '';
-  _.forEach(_.map(s.tasks, createTaskItem), function(element) {
+  _.forEach(_.map(s.tasks, taskItem), function(element) {
     list.appendChild(element);
   });
 }
@@ -98,7 +85,7 @@ form.addEventListener('submit', function(e) {
   update(state);
   form.reset();
   done.classList.add('is-disabled');
-  timeElement.textContent = '00:00:00';
+  updateTimer();
   seconds = 0;
   minutes = 0;
   hours = 0;
