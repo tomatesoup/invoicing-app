@@ -16,18 +16,20 @@ var EMPTY_TIMER = {
   seconds: 0
 }
 
-var h2 = document.getElementsByTagName('h2')[0],
+var h1 = document.getElementsByTagName('h1')[0],
+    timeElement = document.getElementsByTagName('time')[0],
     list = document.getElementsByTagName('ul')[0],
-    start = document.getElementById('start'),
-    stop = document.getElementById('stop'),
+    main = document.querySelector('#main-button'),
+    done = document.getElementById('done'),
     total = document.getElementById('total'),
     form = document.querySelector('#form'),
     create = document.getElementById('create-invoice'),
+    p = document.getElementById('total-hours'),
     seconds = 0,
     minutes = 0,
     hours = 0,
     time = {},
-    interval,
+    interval = null,
     billableHours = [];
 
 create.style.display = 'none';
@@ -43,15 +45,24 @@ function countUp() {
     }
   }
   time = { hours: hours, minutes: minutes, seconds: seconds };
-  h2.textContent = formatTime(time); 
+  timeElement.textContent = formatTime(time); 
 }
 
 function formatTime(t) {
   return (t.hours ? (t.hours > 9 ? t.hours : '0' + t.hours) : '00') + ':' + (t.minutes ? (t.minutes > 9 ? t.minutes : '0' + t.minutes) : '00') + ':' + (t.seconds > 9 ? t.seconds : '0'+ t.seconds);
 }
 
-function timer() {
+function startTimer() {
   interval = setInterval(countUp, 1000);
+  main.classList.add('is-danger');
+  main.textContent = 'stop';
+}
+
+function stopTimer() {
+  clearInterval(interval);
+  interval = null;
+  main.classList.remove('is-danger');
+  main.textContent = 'start';
 }
 
 function createTaskItem(values) {
@@ -67,6 +78,11 @@ function createTaskItem(values) {
 }
 
 function update(s) {
+  if (!s.tasks.length) {
+    total.classList.add('is-disabled');
+  } else {
+    total.classList.remove('is-disabled');   
+  }  
   list.innerHTML = '';
   _.forEach(_.map(s.tasks, createTaskItem), function(element) {
     list.appendChild(element);
@@ -75,28 +91,29 @@ function update(s) {
 
 form.addEventListener('submit', function(e) {
   e.preventDefault();
-  clearInterval(interval);
+  stopTimer();
   var taskObj = serialize(form, true);
   taskObj.time = Object.assign({}, time);
   state.tasks.push(taskObj);
   update(state);
   form.reset();
-  h2.textContent = '00:00:00';
+  done.classList.add('is-disabled');
+  timeElement.textContent = '00:00:00';
   seconds = 0;
   minutes = 0;
   hours = 0;
 });
 
-start.onclick = function() {
-  timer();
-}
-
-stop.onclick = function() {
-  clearInterval(interval);
+main.onclick = function() {
+  done.classList.remove('is-disabled');
+  if (interval === null) {
+    startTimer();
+  } else {
+    stopTimer();
+  }
 }
 
 function displayTotal(total) {
-  var p = document.createElement('p');
   p.textContent = 'Total hours: ' + total;
   return p;
 }
@@ -109,6 +126,8 @@ function timeConverter(t) {
 }
 
 total.onclick = function() {
+  this.classList.add('is-disabled');
+  
   var totalTime = _.reduce(state.tasks, function(pile, task) {
     return {
       hours: pile.hours + task.time.hours, 

@@ -3,29 +3,32 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Time Tracking and Invoicing</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.0.14/css/bulma.min.css">
 		<link rel="stylesheet" href="index.css">
 	</head>
 	<body>
 		<div class="container">
 			<header>
-				<h1>Time Tracker</h1>
+				<h1><time>00:00:00</time></h1>
 			</header>
-			<section class="main">
+			<div class="section">
 				<form id="form">
 			    <input type="text" name="task" placeholder="Name your task">
 			    <input type="text" name="client" placeholder="Who is this for">
 			    <input type="text" name="rate" placeholder="$/hour">
           <div class="buttons">
-            <button type="button" id="start">start</button>
-            <button type="button" id="stop">stop</button>
-            <input type="submit" value="done">
-            <button type="button" id="total">total</button>
+            <button type="button" id="main-button" class="button is-medium is-success start">start</button>
+            <!--<button type="button" id="stop" class="button is-medium is-primary is-danger">stop</button>-->
+            <input type="submit" value="done" id="done" class="button is-medium is-primary is-disabled">
+            <button type="button" id="total" class="button is-medium is-primary is-disabled">total</button>
 				  </div>
 			  </form>
-				<h2><time>00:00:00</time></h2>
 				<ul></ul>
-        <input type="submit" name="create-invoice" id="create-invoice" value="create invoice">
-			</section>
+        <p id="total-hours"></p>
+        <input type="submit" name="create-invoice" id="create-invoice" class="button is-medium is-primary create-invoice" value="create invoice">
+			</div>
 			<footer></footer>
 		</div>
 	</body>

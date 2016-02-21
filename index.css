@@ -6,9 +6,24 @@ body {
 
 body {
 	font-family: -apple-system, 'Helvetica Neue', Helvetica, sans-serif;
+  background-color: #f6f8f8;
+  color: #6d6d6d;
 }
 
-header {
+body {
+  font-family: -apple-system, 'Helvetica Neue', Helvetica, sans-serif;
+  background-color: #fefefe;
+  color: #6d6d6d;
+  margin: 0 auto;
+  position: absolute;
+	width: 500px;
+	height: 500px;
+	top: 20%;
+	left: 30%;
+	text-align: center;
+}
+
+/*header {
 	position: absolute;
 	width: 500px;
 	height: 250px;
@@ -17,11 +32,37 @@ header {
 	margin-top: -125px;
 	margin-left: -250px;
 	text-align: center;
-}
+}*/
 
 header h1 {
 	font-size: 60px;
 	font-weight: 100;
 	margin: 0;
 	padding: 0;
+}
+
+/*.btn {
+    height: 40px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #fefefe;
+    background-color: #44a5c9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: "Proxima Nova", "Helvetica Neue", sans-serif;
+    border: none;
+    border-radius: 3px;  
+}
+
+.btn:hover {
+  background-color: #3fbced;
+}*/
+
+.create-invoice {
+  background-color: #00B289;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
 }
